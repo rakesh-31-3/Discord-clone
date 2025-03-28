@@ -14,6 +14,11 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     phone: {
       type: Number,
       unique: true,
@@ -25,18 +30,6 @@ const userSchema = new Schema(
     profilePic: {
       type: String,
     },
-    servers: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "Server",
-      },
-    ],
-    channels: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "Channel",
-      },
-    ],
     friends: [
       {
         type: mongoose.Types.ObjectId,
