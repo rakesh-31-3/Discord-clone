@@ -1,33 +1,36 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
+import { defineConfig } from "eslint/config";
+import globals from "globals";
+import js from "@eslint/js";
 
-export default [
-  { ignores: ['dist'] },
+export default defineConfig([
   {
-    files: ['**/*.{js,jsx}'],
+    files: ["**/*.{js,mjs,cjs}"],
     languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
-      parserOptions: {
-        ecmaVersion: 'latest',
-        ecmaFeatures: { jsx: true },
-        sourceType: 'module',
-      },
+      globals: globals.node,
+      ecmaVersion: 2022,
     },
-    plugins: {
-      'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
-    },
+    plugins: { js },
+    extends: ["js/recommended"],
     rules: {
-      ...js.configs.recommended.rules,
-      ...reactHooks.configs.recommended.rules,
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
+      quotes: ["error", "double"],
+      indent: ["error", 2],
+      "max-len": ["error", { code: 100 }],
+      semi: ["error", "always"],
+      "comma-dangle": ["error", "always-multiline"],
+      "object-curly-spacing": ["error", "always"],
+      "arrow-parens": ["error", "always"],
+      "no-multiple-empty-lines": ["error", { max: 1, maxEOF: 1 }],
+      "space-before-function-paren": [
+        "error",
+        {
+          anonymous: "always",
+          named: "never",
+          asyncArrow: "always",
+        },
       ],
+      "keyword-spacing": ["error", { before: true, after: true }],
+      "space-infix-ops": "error",
+      "eol-last": ["error", "always"],
     },
   },
-]
+]);
