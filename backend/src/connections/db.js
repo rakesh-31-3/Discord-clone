@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import config from "../../config/config.js";
-const ConnectDB = async () => {
+const connectDB = async () => {
   try {
     const { connection } = await mongoose.connect(config.MONGO_URI);
     if (connection) {
@@ -12,4 +12,4 @@ const ConnectDB = async () => {
     console.log("Error connecting to Database", error);
   }
 };
-export default ConnectDB;
+export default connectDB;
