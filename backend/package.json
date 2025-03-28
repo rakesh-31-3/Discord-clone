@@ -17,7 +17,8 @@
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.15.0",
-    "mongoose": "^8.13.0"
+    "mongoose": "^8.13.0",
+    "mongoose-delete": "^1.0.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.23.0",
