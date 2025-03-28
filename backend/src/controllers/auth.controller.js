@@ -1,70 +1,151 @@
-import {
-  createUserService,
-  verifyUserService,
-} from "../services/auth.service.js";
 import config from "../../config/config.js";
 import logger from "../utils/logger.js";
+import jwt from "jsonwebtoken";
+import User from "../models/user.model.js";
+import bcrypt from "bcrypt";
+import AppError from "../middlewares/appError.js";
+import catchAsync from "../middlewares/catchAsync.js";
 
-export const registerUser = async (req, res, next) => {
+export const registerUser = catchAsync(async (req, res, next) => {
   try {
-
     const data = req.body;
 
-    logger.info("Registration request received", 
-      { reqMethod: req.method, reqUrl: req.originalUrl });
+    logger.info("Registration request received", {
+      reqMethod: req.method,
+      reqUrl: req.originalUrl,
+    });
 
-    //create a new user
-    const newUser = await createUserService(data);
+    const {
+      displayName,
+      username,
+      email,
+      password,
+      DateOfBirth,
+      profilePic,
+    } = data;
 
-    //send a success response with created status code on creating a user
-    res
-      .status(201)
-      .json({ message: "Registration was successful", user: newUser });
-    
-    logger.info("User registered successfully", 
-      { reqMethod: req.method, reqUrl: req.originalUrl });
+    // Check whether each and every field is present
+    if (!username || !email || !password || !DateOfBirth) {
+      return next(new AppError("Missing credentials", 400));
+    }
 
+    // Find user in the db with particular email
+    const user = await User.findOne({ email });
+
+    // If the user is found, then the username cannot be used. A different username
+    // alongwith email and password has to be created for registration.
+    if (user) {
+      return next(new AppError("User already exists", 400));
+    }
+
+    // Store the password in the db using bcrypt hashing.
+    const encryptedPassword = await bcrypt.hash(password, 10);
+
+    // create new user in the db alongwith hashed password.
+    const createdUser = await User.create({
+      username,
+      email,
+      password: encryptedPassword,
+      DateOfBirth,
+      displayName: displayName || null,
+      profilePic: profilePic || null,
+    });
+
+    logger.info("User registered successfully", {
+      reqMethod: req.method,
+      reqUrl: req.originalUrl,
+    });
+
+    // send a success response with created status code on creating a user
+    return res.status(200).send({
+      status: true,
+      message: "User created successfully",
+      data: createdUser,
+    });
   } catch (err) {
-
     // Log error before passing it to the next middleware
     logger.error("Registration failed", {
-      reqMethod: req.method, reqUrl: req.originalUrl, stack: err.stack,
+      reqMethod: req.method,
+      reqUrl: req.originalUrl,
+      stack: err.stack,
     });
 
-    //Pass the error to next middleware (which is a error handler)
+    // Pass the error to next middleware (which is a error handler)
     next(err);
   }
-};
+});
 
-export const loginUser = async (req, res, next) => {
+export const loginUser = catchAsync(async (req, res, next) => {
   try {
+    const { email, phone, password } = req.body;
 
-    const data = req.body;
+    logger.info("Login request received", {
+      reqMethod: req.method,
+      reqUrl: req.originalUrl,
+    });
 
-    logger.info("Login request received", 
-      { reqMethod: req.method, reqUrl: req.originalUrl });
+    let user;
+    if (email) {
+      user = await User.findOne({ email });
+    } else if (phone) {
+      user = await User.findOne({ phone });
+    }
 
-    //verify the user credentials stored in the db
-    const verifiedUser = await verifyUserService(data);
+    // If the user is not found, then throw error saying invalid email id
+    if (!user) {
+      logger.error("Invalid credentials", {
+        reqMethod: req.method,
+        reqUrl: req.originalUrl,
+      });
+      return next(new AppError("Invalid credentials", 400));
+    }
+
+    // Check password matching
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    // If the password does not match, then throw error saying invalid password
+    if (!isMatch) {
+      logger.error("Invalid credentials", {
+        reqMethod: req.method,
+        reqUrl: req.originalUrl,
+      });
+      return next(new AppError("Invalid credentials", 400));
+    }
 
     const userData = {
-      email: verifiedUser.email,
+      email: user.email,
     };
-    
-    //Generate a new token using the user details like id and username
-    const token = jwt.sign(userData, config.JWT_SECRET, { expiresIn: `${config.JWT_ACCESS_EXPIRATION_HOURS}`} );
 
-    res.status(200).json({ message: "Login Successful!", token });
+    // Generate a new token using the user details like id and username
+    const token = jwt.sign(userData, config.JWT_SECRET, {
+      expiresIn: `${config.JWT_ACCESS_EXPIRATION_HOURS}`,
+    });
 
-    logger.info("User logged in successfully", 
-      { reqMethod: req.method, reqUrl: req.originalUrl });
+    const cookieOptions = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    };
 
+    logger.info("User logged in successfully", {
+      reqMethod: req.method,
+      reqUrl: req.originalUrl,
+    });
+
+    return res.cookie("token", token, cookieOptions).status(200).send({
+      // setting the token in the cookies and sending the user data
+      // and cookie as response
+      status: true,
+      message: "User logged in successfully",
+      token: token,
+    });
   } catch (err) {
-    
     logger.error("Login failed", {
-      reqMethod: req.method, reqUrl: req.originalUrl, stack: err.stack,
+      reqMethod: req.method,
+      reqUrl: req.originalUrl,
+      stack: err.stack,
     });
 
     next(err);
   }
-};
+});

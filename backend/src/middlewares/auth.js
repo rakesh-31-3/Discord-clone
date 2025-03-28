@@ -1,8 +1,7 @@
 import jwt from "jsonwebtoken";
-import  config from "../config/config.js";
+import config from "../config/config.js";
 
-export const jwtAuthMiddleware = (req,res, next) => {
-
+export const jwtAuthMiddleware = (req, res, next) => {
   // Check if the Authorization header exists
   const authHeader = req.headers.authorization;
 
@@ -13,29 +12,26 @@ export const jwtAuthMiddleware = (req,res, next) => {
   // Split the Authorization header into 'Bearer' and token
   const token = authHeader.split(" ")[1];
 
-  //If token is not provided, then send response of unauthorized
+  // If token is not provided, then send response of unauthorized
   if (!token) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
   try {
-
-    //If we got a token in the request, verify that token 
+    // If we got a token in the request, verify that token
     // with on the spot generated token using secret key
     const decoded = jwt.verify(token, config.jwtSecret);
-    
-    //On successful verification, store the user details in the req object
-    req.user = decoded;
-    
-    //Go to the controller after this
-    next();
-  }
-  catch (err) {
 
+    // On successful verification, store the user details in the req object
+    req.user = decoded;
+
+    // Go to the controller after this
+    next();
+  } catch (err) {
     if (err.name === "TokenExpiredError") {
       return res.status(401).json({ error: "Token expired" });
     }
-    
+
     res.status(401).json({ error: "Invalid token" });
   }
 };

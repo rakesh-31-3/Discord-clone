@@ -19,16 +19,13 @@ const userSchema = new Schema(
       required: true,
       unique: true,
     },
-    phone: {
-      type: Number,
-      unique: true,
-    },
     DateOfBirth: {
       type: Date,
       require: true,
     },
     profilePic: {
       type: String,
+      default: "https://ibb.co/21BkhFVt",
     },
     friends: [
       {
@@ -37,7 +34,7 @@ const userSchema = new Schema(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 userSchema.plugin(MongooseDelete, { deletedAt: true, overrideMethods: "all" });
 const User = model("User", userSchema);
