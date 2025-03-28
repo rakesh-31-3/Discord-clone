@@ -30,7 +30,7 @@ const serverSchema = new Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 serverSchema.plugin(MongooseDelete, {
   deletedAt: true,

@@ -20,7 +20,7 @@ const friendRequestSchema = new Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 friendRequestSchema.plugin(MongooseDelete, {
   deletedAt: true,

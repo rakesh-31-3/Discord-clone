@@ -44,7 +44,7 @@ const userSchema = new Schema(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 userSchema.plugin(MongooseDelete, { deletedAt: true, overrideMethods: "all" });
 const User = model("User", userSchema);

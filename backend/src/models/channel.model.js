@@ -17,7 +17,7 @@ const channelSchema = new Schema(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 channelSchema.plugin(MongooseDelete, {
   deletedAt: true,

@@ -27,7 +27,7 @@ const messageSchema = new Schema(
       default: "text",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 messageSchema.plugin(MongooseDelete, {
   deletedAt: true,

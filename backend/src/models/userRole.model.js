@@ -17,7 +17,7 @@ const userRolesSchema = new Schema(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 userRolesSchema.plugin(MongooseDelete, {
   deletedAt: true,
