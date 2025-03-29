@@ -116,24 +116,29 @@ export const loginUser = catchAsync(async (req, res, next) => {
       expiresIn: `${config.JWT_ACCESS_EXPIRATION_HOURS}`,
     });
 
-    const cookieOptions = {
-      httpOnly: true,
-      secure: false,
-      sameSite: "Lax",
-    };
+    // const cookieOptions = {
+    //   httpOnly: true,
+    //   secure: false,
+    //   sameSite: "Lax",
+    // };
 
     logger.info("User logged in successfully", {
       reqMethod: req.method,
       reqUrl: req.originalUrl,
     });
 
-    return res.cookie("token", token, cookieOptions).status(200).send({
-      // setting the token in the cookies and sending the user data
-      // and cookie as response
+    return res.status(200).send({
       status: true,
       message: "User logged in successfully",
       token: token,
     });
+    // res.cookie("token", token, cookieOptions).status(200).send({
+    //   // setting the token in the cookies and sending the user data
+    //   // and cookie as response
+    //   status: true,
+    //   message: "User logged in successfully",
+    //   token: token,
+    // });
   } catch (err) {
     logger.error("Login failed", {
       reqMethod: req.method,
