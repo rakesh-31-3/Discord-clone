@@ -24,12 +24,16 @@ export const registerUser = catchAsync(async (req, res, next) => {
     }
 
     // Find user in the db with particular email
-    const user = await User.findOne({ email });
+    const userEmail = await User.findOne({ email });
+    const userName = await User.findOne({ username });
 
     // If the user is found, then the username cannot be used. A different username
     // alongwith email and password has to be created for registration.
-    if (user) {
-      return next(new AppError("User already exists", 400));
+    if (userEmail) {
+      return next(new AppError("Email already exists", 400));
+    }
+    if (userName) {
+      return next(new AppError("Username already exists", 400));
     }
 
     // Store the password in the db using bcrypt hashing.
@@ -63,7 +67,6 @@ export const registerUser = catchAsync(async (req, res, next) => {
       reqUrl: req.originalUrl,
       stack: err.stack,
     });
-
     // Pass the error to next middleware (which is a error handler)
     next(err);
   }
@@ -115,8 +118,8 @@ export const loginUser = catchAsync(async (req, res, next) => {
 
     const cookieOptions = {
       httpOnly: true,
-      secure: true,
-      sameSite: "None",
+      secure: false,
+      sameSite: "Lax",
     };
 
     logger.info("User logged in successfully", {
@@ -137,7 +140,7 @@ export const loginUser = catchAsync(async (req, res, next) => {
       reqUrl: req.originalUrl,
       stack: err.stack,
     });
-
+    console.log(document.cookie.includes("token="));
     next(err);
   }
 });

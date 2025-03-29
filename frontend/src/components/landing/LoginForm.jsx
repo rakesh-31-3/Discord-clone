@@ -24,6 +24,7 @@ const LoginForm = () => {
         credentials: "include",
         body: JSON.stringify(formData),
       });
+      console.log(document.cookie);
 
       const data = await response.json();
 

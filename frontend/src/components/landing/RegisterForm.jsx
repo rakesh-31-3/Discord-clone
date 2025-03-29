@@ -26,6 +26,10 @@ const RegisterForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const { day, month, year, ...rest } = formData;
+
+    const DateOfBirth = `${day}-${month}-${year}`;
+
     try {
       const response = await fetch("http://localhost:8000/auth/register", {
         method: "POST",
@@ -33,14 +37,16 @@ const RegisterForm = () => {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...rest,
+          DateOfBirth,
+        }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
         console.log("Registration successful", data);
-
         setFormData(initialForm);
         setFocusedField(null);
         navigate("/login");
