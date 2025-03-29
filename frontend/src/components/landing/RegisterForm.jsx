@@ -23,12 +23,35 @@ const RegisterForm = () => {
     setFormData({ ...formData, [field]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form Data ➡️", formData);
-    setFormData(initialForm);
-    setFocusedField(null);
-    navigate("/login");
+
+    try {
+      const response = await fetch("http://localhost:8000/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log("Registration successful", data);
+
+        setFormData(initialForm);
+        setFocusedField(null);
+        navigate("/login");
+      } else {
+        console.error("Registration failed:", data.message);
+        alert(data.message || "Registration failed");
+      }
+    } catch (err) {
+      console.error("Error during registration:", err);
+      alert("Something went wrong. Please try again.");
+    }
   };
 
   return (

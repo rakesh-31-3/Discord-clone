@@ -15,14 +15,8 @@ export const registerUser = catchAsync(async (req, res, next) => {
       reqUrl: req.originalUrl,
     });
 
-    const {
-      displayName,
-      username,
-      email,
-      password,
-      DateOfBirth,
-      profilePic,
-    } = data;
+    const { displayName, username, email, password, DateOfBirth, profilePic } =
+      data;
 
     // Check whether each and every field is present
     if (!username || !email || !password || !DateOfBirth) {
@@ -77,7 +71,7 @@ export const registerUser = catchAsync(async (req, res, next) => {
 
 export const loginUser = catchAsync(async (req, res, next) => {
   try {
-    const { email, phone, password } = req.body;
+    const { email, password } = req.body;
 
     logger.info("Login request received", {
       reqMethod: req.method,
@@ -87,8 +81,6 @@ export const loginUser = catchAsync(async (req, res, next) => {
     let user;
     if (email) {
       user = await User.findOne({ email });
-    } else if (phone) {
-      user = await User.findOne({ phone });
     }
 
     // If the user is not found, then throw error saying invalid email id

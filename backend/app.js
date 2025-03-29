@@ -1,13 +1,21 @@
-import express from "express";
+import express, { json } from "express";
 import routes from "./src/routes/index.js";
 import globalErrorHandler from "./src/middlewares/error.js";
 import config from "./config/config.js";
 import connectDB from "./src/connections/db.js";
 import morganLogger from "morgan";
+import cors from "cors";
 
 const app = express();
 
-app.use(express.json());
+app.use(json());
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 
 app.use(morganLogger("dev"));
 

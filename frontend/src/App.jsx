@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import RegisterForm from "./components/landing/RegisterForm";
 import LoginForm from "./components/landing/LoginForm";
+import Home from "./components/homepage/Home";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginForm />} />
         <Route index path="/register" element={<RegisterForm />} />
+        <Route path="/home" element={<Home />} />
       </Routes>
     </Router>
   );
